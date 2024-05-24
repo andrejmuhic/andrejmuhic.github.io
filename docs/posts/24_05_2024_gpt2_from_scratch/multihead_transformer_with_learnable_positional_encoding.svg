@@ -29,14 +29,14 @@
      inkscape:document-units="pt"
      showgrid="false"
      inkscape:zoom="1.4159723"
-     inkscape:cx="828.05291"
-     inkscape:cy="1423.0504"
+     inkscape:cx="645.13974"
+     inkscape:cy="4558.705"
      inkscape:window-width="2560"
      inkscape:window-height="1416"
      inkscape:window-x="2560"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg2657" />
+     inkscape:current-layer="graph0" />
   <g
      id="graph0"
      class="graph"
@@ -7126,9 +7126,9 @@
          text-anchor="start"
          x="782"
          y="-232"
-         font-family="Linux libertine"
-         font-size="10.00"
-         id="text2527">(1024, 128, 65) </text>
+         font-family="'Linux libertine'"
+         font-size="10px"
+         id="text2527">(1024, 128, 65)</text>
     </g>
     <!-- 67&#45;&gt;68 -->
     <g
@@ -7198,9 +7198,9 @@
          text-anchor="start"
          x="782"
          y="-175"
-         font-family="Linux libertine"
-         font-size="10.00"
-         id="text2553">(1024, 128, 65) </text>
+         font-family="'Linux libertine'"
+         font-size="10px"
+         id="text2553">(1024, 128, 65)</text>
       <polygon
          fill="none"
          stroke="black"
@@ -7222,9 +7222,9 @@
          text-anchor="start"
          x="787.5"
          y="-154"
-         font-family="Linux libertine"
-         font-size="10.00"
-         id="text2561">(131072, 65) </text>
+         font-family="'Linux libertine'"
+         font-size="10px"
+         id="text2561">(131072, 65)</text>
     </g>
     <!-- 68&#45;&gt;69 -->
     <g
@@ -7294,9 +7294,9 @@
          text-anchor="start"
          x="976"
          y="-97"
-         font-family="Linux libertine"
-         font-size="10.00"
-         id="text2587">(131072, 65), (131072,) </text>
+         font-family="'Linux libertine'"
+         font-size="10px"
+         id="text2587">(131072, 64), (131072,)</text>
       <polygon
          fill="none"
          stroke="black"
@@ -7378,8 +7378,8 @@
          text-anchor="start"
          x="766"
          y="-86.5"
-         font-family="Linux libertine"
-         font-size="10.00"
+         font-family="'Linux libertine'"
+         font-size="10px"
          id="text2617">(131072, 65)</text>
     </g>
     <!-- 69&#45;&gt;73 -->
@@ -7509,6 +7509,39 @@
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.75"
          x="97.542381"
          y="-2954.4133">Softmax in last dimension</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.75"
+       x="670.38123"
+       y="-283.89816"
+       id="text23104"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.75"
+         x="670.38123"
+         y="-283.89816"
+         id="tspan23106">65 is vocab size, 64 embedding dimension</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.75"
+       x="725.79742"
+       y="-114.4557"
+       id="text7019"><tspan
+         sodipodi:role="line"
+         id="tspan7017"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.75"
+         x="725.79742"
+         y="-114.4557">logits</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.75"
+       x="927.39606"
+       y="-119.51207"
+       id="text12219"><tspan
+         sodipodi:role="line"
+         id="tspan12217"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.75"
+         x="927.39606"
+         y="-119.51207">loss</tspan></text>
   </g>
   <text
      xml:space="preserve"
