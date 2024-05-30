@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Andrej Muhic">
+<meta name="dcterms.date" content="2024-05-30">
 
-<title>andrejmuhic.github.io</title>
+<title>andrejmuhic.github.io - Formula that generates all primes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,27 +22,59 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -68,35 +102,6 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
 
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -128,17 +133,17 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">andrejmuhic.github.io</span>
     </a>
   </div>
@@ -149,7 +154,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
@@ -172,158 +177,88 @@ window.Quarto = {
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">andrejmuhic.github.io</h1>
-                      </div>
+    <div class="quarto-title column-body">
+      <h1 class="title">Formula that generates all primes</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">Algebra</div>
+                <div class="quarto-category">Number Theory</div>
+              </div>
+                  </div>
   </div>
     
   
-  <div class="quarto-title-meta column-page-left">
+  <div class="quarto-title-meta">
 
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Andrej Muhic </p>
+            </div>
+    </div>
       
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">May 30, 2024</p>
+      </div>
+    </div>
     
       
     </div>
     
   
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(3)</span></div><div class="category" data-category="Algebra">Algebra <span class="quarto-category-count">(1)</span></div><div class="category" data-category="NLP">NLP <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Number Theory">Number Theory <span class="quarto-category-count">(1)</span></div><div class="category" data-category="analysis">analysis <span class="quarto-category-count">(1)</span></div><div class="category" data-category="code">code <span class="quarto-category-count">(1)</span></div><div class="category" data-category="deep learning">deep learning <span class="quarto-category-count">(1)</span></div><div class="category" data-category="news">news <span class="quarto-category-count">(1)</span></div><div class="category" data-category="transformers">transformers <span class="quarto-category-count">(1)</span></div></div></div>
+    
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
 
 
+<p>Fun fact, one possible formula that generates all primes, <span class="math inline">\(2\)</span> many times is: <span class="math display">\[2+\left( (2 \times  (n-1)!) \bmod n \right)\]</span> Prime numbers are numbers that have only <span class="math inline">\(1\)</span> and itself as divisors like, <span class="math inline">\(2, 3, 5, 7, 11, \dots.\)</span> Sadly formula is very inefficient and there are a lot more efficient algorithms to check if <span class="math inline">\(n\)</span> is prime. Maybe story for another time. Mod n operator computes the remainder of target number when doing the division by n, like <span class="math inline">\(14 \mod 5 = 4\)</span> as <span class="math inline">\(14 = 2 \times 5 + 4.\)</span></p>
+<section id="proof-using-wilsons-theorem" class="level2">
+<h2 class="anchored" data-anchor-id="proof-using-wilsons-theorem">Proof using Wilson’s theorem</h2>
+<p>One possible but boring way of proving this is just by using the Wilson’s theorem directly, which says that: <span class="math display">\[ (n-1)! + 1 \mod n = 0 \Leftrightarrow n \texttt{ is a prime} \Leftrightarrow (n-1)! \mod n = n-1 \mod n = -1.\]</span></p>
+<p>Let us expand, when <span class="math inline">\(n=p\)</span> and <span class="math inline">\(p\)</span> is a prime: <span class="math display">\[\left(2 \times  (n-1)! \bmod n \right) = \left(2 \times  (p-1)! \bmod p \right) = -2 \mod p = p - 2.\]</span> Thus for the above we end up with <span class="math inline">\(2 + (p-2) = p\)</span> if <span class="math inline">\(p\)</span> is a prime.</p>
+<p>If <span class="math inline">\(n\)</span> is not a prime and even, then <span class="math inline">\((n-1)!\)</span> has a factor <span class="math inline">\(\frac{n}{2}\)</span> and thus <span class="math inline">\(2 \times (n-1)! \mod n = 0 \neq -2 \mod n\)</span></p>
+<p>If <span class="math inline">\(n = 2 \times k + 1\)</span> is not a prime and odd, <span class="math inline">\(n = a \times b, \; a \leq b,\)</span> then <span class="math inline">\(a, b\)</span> are one of the factors in <span class="math inline">\(2(n-1)!\)</span> and <span class="math inline">\(2 \times (n-1)! \mod n = 0 \neq -2 \mod n\)</span></p>
+<p>As a note even if <span class="math inline">\(a=b\)</span> then <span class="math inline">\(a=(a+1-1)\)</span> is a direct factor and at least one another one is <span class="math inline">\(a=2\frac{(a+1-1)}{2}\)</span> or <span class="math inline">\(2a = (2a+1-1).\)</span></p>
+</section>
+<section id="wilsons-theorem-from-scratch" class="level2">
+<h2 class="anchored" data-anchor-id="wilsons-theorem-from-scratch">Wilson’s theorem from scratch</h2>
+<p>I find this one much more enjoyable as it does not require Galois theory results. Let us define the polynomial on the ring <span class="math inline">\(Z_n\)</span>: <span class="math display">\[q(x) = (x-1) (x-2) \cdot (x - (n-1)) + 1.\]</span> This polynomial is trivially <span class="math inline">\(0\)</span> for <span class="math inline">\(x = 1, \dots (n-1).\)</span> For <span class="math inline">\(x=n,\)</span> <span class="math inline">\(q(n) = (n-1)! + 1.\)</span> If <span class="math inline">\(n\)</span> is a prime, then product of invertible elements is <span class="math inline">\(-1=p-1 \mod p.\)</span> Why? The product of <span class="math inline">\(z \times z^{-1} = 1\)</span> and the only elements which inverse is the element itself are the solutions of <span class="math inline">\(z^2 = 1 \mod p,\)</span> which is equivalent to <span class="math inline">\((z-1)(z+1) = 0 \mod p.\)</span> As <span class="math inline">\(p\)</span> is the prime number that means the only solutions are <span class="math inline">\(z=1\)</span> or <span class="math inline">\(z=-1.\)</span> This means that the product of invertible elements is exactly <span class="math inline">\(-1 \mod p\)</span> as desired, when <span class="math inline">\(p\)</span> is prime.</p>
+<p>Let us prove that if <span class="math inline">\(n\)</span> is not a prime it cannot divide <span class="math inline">\((n-1)! + 1.\)</span> This means we can write <span class="math inline">\(n = a \times b \; \texttt{ where } a\geq 2,\; b \geq 2.\)</span> We can actually apply the reasoning from the first part. <span class="math display">\[\texttt{QED}\]</span></p>
+<p>The <a href="https://commons.wikimedia.org/wiki/File:Prime-numbers_01.jpg">picture</a> source is used under <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">Creative commons license</a>.</p>
+<section id="python-modestly-optimized-implementation" class="level3">
+<h3 class="anchored" data-anchor-id="python-modestly-optimized-implementation">Python modestly optimized implementation</h3>
+<div id="08c6ccf9-df4b-4397-9273-1e24ef46852c" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2024-05-30T19:36:36.072923Z&quot;,&quot;start_time&quot;:&quot;2024-05-30T19:36:36.067905Z&quot;}" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> generate_primes(n: <span class="bu">int</span>) <span class="op">-&gt;</span> <span class="bu">int</span>:</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">    :param n: </span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">    :return: if n is prime, function will return n, otherwise 2</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># compute (n-1)! using mod n to avoid complexity</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    n_minus_1_factorial <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>, n):</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        n_minus_1_factorial <span class="op">=</span> n_minus_1_factorial <span class="op">*</span> i</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        n_minus_1_factorial <span class="op">=</span> n_minus_1_factorial <span class="op">%</span> n</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">2</span> <span class="op">+</span> ((<span class="dv">2</span> <span class="op">*</span> n_minus_1_factorial) <span class="op">%</span> n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="82866e7c-c92d-44c5-bb1f-a6c627b5f26f" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>generate_primes(<span class="dv">17</span>), generate_primes(<span class="dv">90</span>), generate_primes(<span class="dv">97</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>(17, 2, 97)</code></pre>
+</div>
+</div>
 
 
+</section>
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="Algebra,Number Theory" data-listing-date-sort="1717023600000" data-listing-file-modified-sort="1717098210343" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="463">
-<div class="thumbnail">
-<p><a href="./posts/30_5_2024_generating_all_primes/generating_all_primes.html" class="no-external"></a></p><a href="./posts/30_5_2024_generating_all_primes/generating_all_primes.html" class="no-external">
-<p><img src="./posts/30_5_2024_generating_all_primes/prime_numbers.jpg" class="thumbnail-image"></p>
-</a><p><a href="./posts/30_5_2024_generating_all_primes/generating_all_primes.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/30_5_2024_generating_all_primes/generating_all_primes.html" class="no-external">Formula that generates all primes</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/30_5_2024_generating_all_primes/generating_all_primes.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Algebra'); return false;">
-Algebra
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Number Theory'); return false;">
-Number Theory
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/30_5_2024_generating_all_primes/generating_all_primes.html" class="no-external">Fun fact, one possible formula that generates all primes, <span class="math inline">\(2\)</span> many times is: <span class="math display">\[2+\left( (2 \times  (n-1)!) \bmod n \right)\]</span> Prime numbers are numbers that have only <span class="math inline">\(1\)</span> …<span class="math inline"></span><span class="math inline"></span><span class="math inline"></span><span class="math inline"></span></a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/30_5_2024_generating_all_primes/generating_all_primes.html" class="no-external">
-<div class="listing-date">
-May 30, 2024
-</div>
-<div class="listing-author">
-Andrej Muhic
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="NLP,transformers,deep learning,code,analysis" data-listing-date-sort="1716850800000" data-listing-file-modified-sort="1717094994373" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1212">
-<div class="thumbnail">
-<p><a href="./posts/24_05_2024_gpt2_from_scratch/gpt_dev.html" class="no-external"></a></p><a href="./posts/24_05_2024_gpt2_from_scratch/gpt_dev.html" class="no-external">
-<p><img src="./posts/24_05_2024_gpt2_from_scratch/multihead_transformer_with_learnable_positional_encoding.svg" class="thumbnail-image"></p>
-</a><p><a href="./posts/24_05_2024_gpt2_from_scratch/gpt_dev.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/24_05_2024_gpt2_from_scratch/gpt_dev.html" class="no-external">GPT and more from scratch with comments</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/24_05_2024_gpt2_from_scratch/gpt_dev.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('NLP'); return false;">
-NLP
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('transformers'); return false;">
-transformers
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('deep learning'); return false;">
-deep learning
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('code'); return false;">
-code
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('analysis'); return false;">
-analysis
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/24_05_2024_gpt2_from_scratch/gpt_dev.html" class="no-external">All original credits to companion notebook to the Zero To Hero video on GPT by Andrej Karpathy. Code was modified and heavily commented.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/24_05_2024_gpt2_from_scratch/gpt_dev.html" class="no-external">
-<div class="listing-date">
-May 28, 2024
-</div>
-<div class="listing-author">
-Andrej Muhic
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="news" data-listing-date-sort="1716850800000" data-listing-file-modified-sort="1716923537021" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="53">
-<div class="thumbnail">
-<p><a href="./posts/welcome/index.html" class="no-external"></a></p><a href="./posts/welcome/index.html" class="no-external">
-<p class="card-img-top"><img src="posts/welcome/thumbnail.jpg"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/welcome/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/welcome/index.html" class="no-external">Welcome To My Blog</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/welcome/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('news'); return false;">
-news
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/welcome/index.html" class="no-external">This is the first post in my Quarto blog. Welcome! I will mainly post about the topics I like playing with. Sometimes I will use this blog to motivate the cleaner exposition…</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/welcome/index.html" class="no-external">
-<div class="listing-date">
-May 28, 2024
-</div>
-<div class="listing-author">
-Andrej Muhic
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -403,6 +338,57 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
