@@ -1,0 +1,14 @@
+This first post is about transformer architecture and deep learning in general.
+I started writing a blog, I will mainly write about the topics that I find interesting and material that I gathered over the years.
+This is meant as a collection of resources to facilitate deeper and easier understanding of the transformer architecture and also the main deep learning concepts. I also prepared the full graph of multi head causal transformer with learnable embedding. The full blown annotated image of the multi head attention with learnable positional encoding is displayed.
+
+- For full details you can check my extensive blog post: 
+https://lnkd.in/evw2c8rZ
+
+Otherwise if you can reason about the model only looking at the picture then you can skip most of the details and just dive in. The code follows Karpathy's notebook hackable style and tries to be well documented with plenty of the links to the additional resources that help to look at things from different perspective, resources are probably more valuable than the code itself. 
+
+If you are beginner in deep learning and have solid mathematical background I also provide some practical advice and collection of resources that can be helpful to get up to the speed quickly. 
+
+I was using this mainly as scratchpad to note my ideas and questions over years. The view that I liked the most is transformers as GNN with additional positional encoding as I got attracted by symmetry, group and even categorical abstract motivation of the deep learning in general when put in Geometric Deep Learning paradigm, I am a big fan of Petar Veličković work. 
+
+I would like to also to point to extrakt.AI for nice use case in information extraction. I would also like to say thanks to specifically Jan Rupnik and also AiLab (at) JSI for several stimulating discussions. I also recommend checking Klemen Simonic and Soniox for interesting applications of DL with the aim of the deeper understanding of the audio.

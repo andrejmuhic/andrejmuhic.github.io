@@ -1,0 +1,44 @@
+Jax Typing and how to do named dimension checking with a code example. This is really useful as the code is much easier to read and on top of that input and output dimensions are checked runtime. This is probably only real option currently as sadly PyTorch named tensor project is mainly abandoned? Let us proceed to code example:
+
+https://lnkd.in/exVXTV-p
+
+
+
+The output dimensions depend on input dimensions. This is extremely elegant way of expressing the requirements and avoid strange bugs.
+
+One should use beartype for random runtime sampling and typeguard for static runtime checking. Also has advantage that one can avoid mypy  but still has some guarantees. It can be very annoying to type decorate properly for mypy, especially when using external libraries, as python is inherently dynamic language.
+
+
+
+def forward_broken(idx: Long[torch.Tensor, "batch_dim context_dim"],
+
+            targets: Long[torch.Tensor, "batch_dim context_dim"]) -> Tuple[
+
+    Float[torch.Tensor, "batch_dim context_dim latent_dim"], Float[torch.Tensor, ""]]:
+
+    # idx and targets are both (B,T) tensor of integers
+
+    logits: Long[torch.Tensor, "batch_dim context_dim latent_dim"] = token_embedding_table(
+
+        idx)  # (B,T,C=vocab_size)
+
+    # Note that here strictly speaking this does not fix batch size explicitly to B
+
+    B, T, C = logits.shape  # (B,T,C=vocab_size)
+
+    # Just a hack to avoid transposing, cross_entropy expects B x C x T in batched mode
+
+    # This converts into non batched mode
+
+    logits: Long[torch.Tensor, "batch_dim*context_dim latent_dim"] = logits.view(B * T, C)
+
+    # The above is clearly wrong but will not be checked currently
+
+    targets: Long[torch.Tensor, "batch_dim*context_dim"] = targets.view(B * T)
+
+    # https://agustinus.kristia.de/techblog/2016/12/21/forward-reverse-kl/
+
+    loss: Float[torch.Tensor, ""] = F.cross_entropy(logits, targets)
+
+    return logits, loss
+

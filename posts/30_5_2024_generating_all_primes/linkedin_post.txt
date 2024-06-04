@@ -1,0 +1,38 @@
+Fun fact, one possible formula that generates all primes, $2$ many times is:
+$$2+\left( (2 \times (n-1)!) \bmod n \right)$$
+For rendered output see:
+https://lnkd.in/ehAwk6ih
+Prime numbers are numbers that have only $1$ and itself as divisors like, $2, 3, 5, 7, 11, \dots.$ Sadly formula is very inefficient and there are a lot more efficient algorithms to check if $n$ is prime. Maybe story for another time.
+Mod n operator computes the remainder of target number when doing the division by n, like $14 \mod 5 = 4$ as $14 = 2 \times 5 + 4.$
+I provide the python code in the blog post to try it out.
+
+Only continue to details bellow if you like numbers and a bit of number theory.
+
+Proof using Wilson's theorem
+
+One possible but boring way of proving this is just by using the Wilson's theorem directly, which says that:
+$$ (n-1)! + 1 \mod n = 0 \Leftrightarrow n \texttt{ is a prime} \Leftrightarrow (n-1)! \mod n = n-1 \mod n = -1.$$
+
+If you like Algebra and Number theory you may find this one exciting.
+
+Wilson's theorem from scratch
+
+I find this one much more enjoyable as it does not require Galois theory results. Let us define the polynomial on the ring $Z_n$:
+$$q(x) = (x-1) (x-2) \cdot (x - (n-1)) + 1.$$
+This polynomial is trivially $0$ for $x = 1, \dots (n-1).$
+For $x=n,$ $q(n) = (n-1)! + 1.$ If $n$ is a prime, then product of invertible elements is $-1=p-1 \mod p.$ Why?
+The product of $z \times z^{-1} = 1$ and the only elements which inverse is the element itself are the solutions of $z^2 = 1 \mod p,$ which is equivalent to $(z-1)(z+1) = 0 \mod p.$ As $p$ is the prime number that means the only solutions are $z=1$ or $z=-1.$ This means that the product of invertible elements is exactly $-1 \mod p$ as desired, when $p$ is prime.
+
+Let us prove that if $n$ is not a prime it cannot divide $(n-1)! + 1.$
+This means we can write $n = a \times b \; \texttt{ where } a\geq 2,\; b \geq 2.$ We can actually apply the reasoning from the first part.
+$$\texttt{QED}$$
+
+Let us expand, when $n=p$ and $p$ is a prime:
+$$\left(2 \times (n-1)! \bmod n \right) = \left(2 \times (p-1)! \bmod p \right) = -2 \mod p = p - 2.$$
+Thus for the above we end up with $2 + (p-2) = p$ if $p$ is a prime.
+
+If $n$ is not a prime and even, then $(n-1)!$ has a factor $\frac{n}{2}$ and thus $2 \times (n-1)! \mod n = 0 \neq -2 \mod n$
+
+If $n = 2 \times k + 1$ is not a prime and odd, $n = a \times b, \; a \leq b,$ then $a, b$ are one of the factors in $2(n-1)!$ and $2 \times (n-1)! \mod n = 0 \neq -2 \mod n$
+
+As a note even if $a=b$ then $a=(a+1-1)$ is a direct factor and at least one another one is $a=2\frac{(a+1-1)}{2}$ or $2a = (2a+1-1).$
