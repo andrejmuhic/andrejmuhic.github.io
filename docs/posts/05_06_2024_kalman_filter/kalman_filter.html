@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Andrej Muhic">
+<meta name="dcterms.date" content="2024-06-05">
+
+<title>andrejmuhic.github.io - Kalman filter exposed</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">andrejmuhic.github.io</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Kalman filter exposed</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">State space</div>
+                <div class="quarto-category">Kalman filter</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Andrej Muhic </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">June 5, 2024</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="kalman-filter" class="level2">
+<h2 class="anchored" data-anchor-id="kalman-filter">Kalman filter</h2>
+<p>The canonical example of using Kalman filter would be kinematic motion of a car, where state consists of position, velocity and potentially acceleration and other variables. The noise is traditionally induced by random forces. The kinematic equations induce the prior on the state and thus position of the car. On top of that we are able to observe the position with some random noise by means of for example GPS and that serves as additional correction of the state distribution and this induces the posterior. The cleanest setup is Bayesian. Traditionally the noise components are constant and Gaussian. We will not add control part, which would be otherwise known acceleration induced by known forces on the car, robot, etc.</p>
+<ul>
+<li><span id="eq-measure"><span class="math display">\[\text{measurement equation} \; \; y_t = F s_t + \epsilon_t,\;\; \text{where } \epsilon_t \sim N(0, \Omega_\epsilon), \text{where } F, \Omega_\epsilon \text{ are known} \tag{1}\]</span></span></li>
+<li><span id="eq-transition"><span class="math display">\[\text{transition equation} \; \; s_t = G s_{t-1} + \eta_t,\;\; \text{where } \eta_t \sim N(0, \Omega_\eta), , \text{where } G, \Omega_\eta \text{ are known}  \tag{2}\]</span></span> <!-- end of list --></li>
+</ul>
+<p>Let us define: <span id="eq-history"><span class="math display">\[\text{full history of observations} \; \; \pmb{Y}_t = \left(y_1, y_2, \dots, y_{t-1}, y_{t}\right) \tag{3}\]</span></span> All noise components are Gaussian thus the joint and all marginals, conditional marginals will be Gaussian too. This enables simple computation of the posterior. We want to find <span class="math inline">\(P(s_t|Y_t).\)</span></p>
+</section>
+<section id="bayesian-interpretation" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-interpretation">Bayesian interpretation</h2>
+<ul>
+<li><span class="math display">\[P(y_t|s_t, \pmb{Y}_{t-1}) = \frac{P(y_t, s_t, \pmb{Y}_{t-1})}{P(s_t, \pmb{Y}_{t-1})}\]</span></li>
+<li><span class="math display">\[P(s_t|\pmb{Y}_{t-1}) = \frac{P(s_t, \pmb{Y}_{t-1})}{P(\pmb{Y}_{t-1})}\]</span></li>
+<li><span class="math display">\[P(y_t, \pmb{Y}_{t-1}) = \int P(s_t, y_t|\pmb{Y}_{t-1}) \;\texttt{d} s_t \times P(\pmb{Y}_{t-1})\]</span></li>
+<li><span class="math display">\[P(y_t| \pmb{Y}_{t-1}) = \int P(s_t, y_t|\pmb{Y}_{t-1}) \;\texttt{d} s_t \]</span></li>
+<li><span class="math display">\[P(s_t|\pmb{Y}_t) = P(s_t|y_t, \pmb{Y}_{t-1}) = \frac{P(s_t, y_t, \pmb{Y}_{t-1})}{P(y_t, \pmb{Y}_{t-1})} = \frac{P(y_t|s_t, \pmb{Y}_{t-1}) \times P(s_t|\pmb{Y}_{t-1})}{P(y_t| \pmb{Y}_{t-1})}\]</span> Let us put this together:</li>
+<li>The process is initialized by specifying initial <span class="math inline">\(s_0\)</span> and <span class="math inline">\(\Sigma_0.\)</span></li>
+<li><span class="math display">\[s_{t-1}|\pmb{Y}_{t-1} \sim N(\widehat{s}_{t-1}, \Sigma_{t-1}),\]</span> where <span class="math inline">\(\widehat{s}_{t-1}\)</span> is the mean of <span class="math inline">\(s_{t-1}.\)</span></li>
+<li>Out prior from transition is: <span class="math display">\[s_t|\pmb{Y}_{t-1} \sim N(G \widehat{s}_{t-1}, R_t), \]</span> where <span class="math display">\[R_t = G\Sigma_{t-1}G^T + \Omega_\eta.\]</span></li>
+<li>From observation we get: <span class="math display">\[y_t|s_t, \pmb{Y}_{t-1} \sim N(Fs_t, \Omega_\epsilon).\]</span></li>
+<li>Thus posterior is of the form: <span class="math display">\[P(s_t|\pmb{Y}_t) = \frac{P(y_t|s_t, \pmb{Y}_{t-1}) \times P(s_t|\pmb{Y}_{t-1})}{P(y_t| \pmb{Y}_{t-1})}.\]</span> It is kind of nasty to compute the posterior by hand but we know it is Gaussian distribution again!</li>
+</ul>
+<p>We will borrow the result that will greatly simplify this. Let <span class="math inline">\(x, y\)</span> be jointly Gaussian: <span class="math display">\[\begin{bmatrix} x \\ y\end{bmatrix} \sim N\left(\begin{bmatrix} \mu_x \\ \mu_y\end{bmatrix}, \begin{bmatrix}A &amp; C\\C^T&amp; B\end{bmatrix}\right) = N\left(\begin{bmatrix} \mu_x \\ \mu_y\end{bmatrix}, \begin{bmatrix}\widetilde{A} &amp; \widetilde{C}\\\widetilde{C}^T&amp; \widetilde{B}\end{bmatrix}^{-1}\right),\]</span> then the marginal distribution of <span class="math inline">\(x\)</span> and <span class="math inline">\(x|y\)</span> are: <span class="math display">\[x \sim N(\mu_x, A), \text{ and } x|y \sim N(\mu_x + CB^{-1}(y-\mu_y), A-CB^{-1}C^T)\]</span> or <span class="math display">\[x|y \sim N(\mu_x - \widetilde{A}^{-1}\widetilde{C}(y-\mu_y), \widetilde{A}^{-1})\]</span> How does this help us. Let us write in block form: <span class="math display">\[\begin{bmatrix} s_t \\ y_t \end{bmatrix} | \pmb{Y}_{t-1}= \begin{bmatrix} G &amp; I &amp; 0\\ FG &amp; F &amp; I \end{bmatrix} \begin{bmatrix} s_{t-1} \\ \eta_t \\ \epsilon_t \end{bmatrix} | \pmb{Y}_{t-1}\]</span> We also know: <span class="math display">\[\begin{bmatrix} s_{t-1} \\ \eta_t \\ \epsilon_t \end{bmatrix} | \pmb{Y}_{t-1} =  \begin{bmatrix}s_{t-1}|\pmb{Y}_{t-1} \\ \eta_t \\ \epsilon_t \end{bmatrix} \sim N\left(\begin{bmatrix} \widehat{s}_{t-1}\\ 0 \\0\end{bmatrix}, \begin{bmatrix} \Sigma_{t-1} &amp; 0 &amp; 0\\ 0 &amp; \Omega_{\eta} &amp; 0\\ 0 &amp; 0 &amp; \Omega_{\epsilon}\end{bmatrix}\right) \]</span> We do block multiplication and use the fact that <span class="math inline">\(\texttt{var}(M v) = M \texttt{var}(v) M^T\)</span> obtain: <span class="math display">\[\begin{bmatrix} s_t \\ y_t \end{bmatrix} | \pmb{Y}_{t-1}  \sim N\left(\begin{bmatrix} G \widehat{s}_{t-1} \\  FG \widehat{s}_{t-1}\end{bmatrix}, \begin{bmatrix} G &amp; I &amp; 0\\ FG &amp; F &amp; I \end{bmatrix} \begin{bmatrix} \Sigma_{t-1} &amp; 0 &amp; 0\\ 0 &amp; \Omega_{\eta} &amp; 0\\ 0 &amp; 0 &amp; \Omega_{\epsilon} \end{bmatrix} \begin{bmatrix} G &amp; I &amp; 0\\ FG &amp; F &amp; I \end{bmatrix}^T \right)=\]</span> Let us define: <span class="math display">\[R_t = G \Sigma_{t-1} G^T + \Omega_{\eta},\]</span> then continue: <span class="math display">\[\begin{bmatrix} s_t \\ y_t \end{bmatrix} | \pmb{Y}_{t-1}  \sim N\left(\begin{bmatrix} G \widehat{s}_{t-1} \\  FG \widehat{s}_{t-1}\end{bmatrix}, \begin{bmatrix} R_{t} &amp; R_{t} F^T\\ FR_{t-1}^T &amp; FR_{t}F^T + \Omega_\epsilon \end{bmatrix} \right).\]</span> Now we are ready to compute: <span class="math display">\[s_t| \pmb{Y}_{t-1} | y_t \sim N\left(G \widehat{s}_{t-1} + R_{t}F^T (FR_{t}F^T + \Omega_\epsilon)^{-1}(y_t - G \widehat{s}_{t-1}) , R_t -  R_t F^T (FR_tF^T+\Omega_\epsilon)^{-1} F R_t^T\right). \]</span></p>
+</section>
+<section id="simple-two-dimensional-movement-example" class="level2">
+<h2 class="anchored" data-anchor-id="simple-two-dimensional-movement-example">Simple two dimensional movement example</h2>
+<p>Let us provide an example of this as two dimensional movement, where <span class="math inline">\(x\)</span> denotes position and <span class="math inline">\(v\)</span> velocity. The system is exposed to random forces.</p>
+<p><span class="math display">\[s_t = \begin{bmatrix} x_1 \\ x_2\\ v_1 \\ v_2\end{bmatrix}.\]</span> The transtion equations are <span class="math display">\[x_1' = x_1 + v_1 \texttt{dt} \times  + a_1 \frac{\texttt{dt}^2}{2}  \text{ and } x_2' = x_2 + \texttt{dt} \times v_2 + a_2 \frac{\texttt{dt}^2}{2}.\]</span> Let us assume that all acceleration comes from independent random external forces. The <span class="math inline">\(s_t' = s_{t+1}\)</span> is short hand notation and acts on all vector components. This can be rewritten in matrix form as: <span class="math display">\[ s_t' = \begin{bmatrix} x_1 \\ x_2\\ v_1 \\ v_2\end{bmatrix}' = \overbrace{\begin{bmatrix} 1 &amp; 0 &amp; \texttt{dt} &amp; 0\\0 &amp; 1 &amp; 0 &amp; \texttt{dt}\\0 &amp; 0 &amp;1 &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 1\end{bmatrix}}^G s_t + \overbrace{\begin{bmatrix} \frac{\texttt{dt}^2}{2} &amp; 0\\ 0 &amp; \frac{\texttt{dt}^2}{2}\\ \texttt{dt} &amp; 0 \\ 0 &amp;\texttt{dt}\end{bmatrix}}^{\texttt{denote } V \texttt{ such that } \eta_{t+1} \sim N(0, VV^T)} \overbrace{\begin{bmatrix} a_1 \\ a_2 \end{bmatrix}}^{\sim N(0,I_2)}.\]</span> Expanding all this: <span class="math display">\[ s_{t+1} = G s_t + \eta_t, \text{ where } \eta_{t+1} = \begin{bmatrix} \frac{\texttt{dt}^4}{4} &amp; 0 &amp; \frac{\texttt{dt}^3}{2} &amp; 0\\ 0 &amp; \frac{\texttt{dt}^4}{4} &amp; 0 &amp; \frac{\texttt{dt}^3}{2}\\ \frac{\texttt{dt}^3}{2} &amp; 0 &amp; \texttt{dt}^2 &amp; 0 \\ 0 &amp;\frac{\texttt{dt}^3}{2} &amp; 0 &amp;\texttt{dt}^2\end{bmatrix}\]</span> The observation equation is simply: <span class="math display">\[y_{t+1} = y_t' = \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}' =  \overbrace{\begin{bmatrix} 1 &amp; 0 &amp; 0 &amp; 0\\ 0 &amp; 0 &amp; 1 &amp; 0 \end{bmatrix}}^F \overbrace{\begin{bmatrix} x_1 \\ v_1\\ x_2 \\ v_2\end{bmatrix}}^{s_t} + \overbrace{\epsilon_t}^{\sim N(0, \frac{I_2}{4})}\]</span></p>
+</section>
+<section id="simple-movement-equation-example-in-python" class="level2">
+<h2 class="anchored" data-anchor-id="simple-movement-equation-example-in-python">Simple movement equation example in python</h2>
+<p>There are several options for estimation:</p>
+<ul>
+<li>From scratch</li>
+<li><a href="https://www.statsmodels.org/stable/statespace.html#models-and-estimation">Statsmodels statespace</a></li>
+<li><a href="https://github.com/pykalman/pykalman">pykalman</a></li>
+<li><a href="https://www.pymc.io/projects/docs/en/stable/learn.html">pymc</a> <a href="https://discourse.pymc.io/t/pymc-experimental-now-includes-state-spaces-models/12773">pymc experimental statsmodels</a></li>
+</ul>
+<section id="parameters-and-data-setup" class="level3">
+<h3 class="anchored" data-anchor-id="parameters-and-data-setup">Parameters and data setup</h3>
+<div id="fc07b7563c085925" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2024-06-04T07:27:14.089348Z&quot;,&quot;start_time&quot;:&quot;2024-06-04T07:27:13.157520Z&quot;}" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># No control input in this example but that is just constant vector dependent on t</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy <span class="im">import</span> linalg</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd  <span class="co"># Pandas isn't necessary, but makes some output nicer</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>path_csv <span class="op">=</span> Path(<span class="st">'./measurements_2d.csv'</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>Y_pandas <span class="op">=</span> pd.read_csv(path_csv, index_col<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> Y_pandas.values</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># The matrices in the dynamic model are set up as follows</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>omega_eta, dt, omega_eps <span class="op">=</span> <span class="dv">1</span>, <span class="fl">0.1</span>, <span class="fl">0.5</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>G <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">0</span>, dt, <span class="dv">0</span>],</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>              [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, dt],</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>              [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>],</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>              [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>]])</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>Omega_custom <span class="op">=</span> omega_eta <span class="op">**</span> <span class="dv">2</span> <span class="op">*</span> np.array([[dt <span class="op">**</span> <span class="dv">3</span> <span class="op">/</span> <span class="dv">3</span>, dt <span class="op">**</span> <span class="dv">2</span> <span class="op">/</span> <span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">0</span>],</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>                                          [dt <span class="op">**</span> <span class="dv">2</span> <span class="op">/</span> <span class="dv">2</span>, dt, <span class="dv">0</span>, <span class="dv">0</span>],</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>                                          [<span class="dv">0</span>, <span class="dv">0</span>, dt <span class="op">**</span> <span class="dv">3</span> <span class="op">/</span> <span class="dv">3</span>, dt <span class="op">**</span> <span class="dv">2</span> <span class="op">/</span> <span class="dv">2</span>],</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>                                          [<span class="dv">0</span>, <span class="dv">0</span>, dt <span class="op">**</span> <span class="dv">2</span> <span class="op">/</span> <span class="dv">2</span>, dt]])</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>Omega_eta <span class="op">=</span> omega_eta <span class="op">**</span> <span class="dv">2</span> <span class="op">*</span> np.array([[dt <span class="op">**</span> <span class="dv">4</span> <span class="op">/</span> <span class="dv">4</span>, <span class="dv">0</span>, dt <span class="op">**</span> <span class="dv">3</span> <span class="op">/</span> <span class="dv">2</span>, <span class="dv">0</span>],</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>                                       [<span class="dv">0</span>, dt <span class="op">**</span> <span class="dv">4</span> <span class="op">/</span> <span class="dv">4</span>, <span class="dv">0</span>, dt <span class="op">**</span> <span class="dv">3</span> <span class="op">/</span> <span class="dv">2</span>],</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>                                       [dt <span class="op">**</span> <span class="dv">3</span> <span class="op">/</span> <span class="dv">2</span>, <span class="dv">0</span>, dt <span class="op">**</span> <span class="dv">2</span>, <span class="dv">0</span>],</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>                                       [<span class="dv">0</span>, dt <span class="op">**</span> <span class="dv">3</span> <span class="op">/</span> <span class="dv">2</span>, <span class="dv">0</span>, dt <span class="op">**</span> <span class="dv">2</span>]])</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Matrices in the measurement model are designed as follows</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>],</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>              [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>]])</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>Omega_epsilon <span class="op">=</span> omega_eps <span class="op">**</span> <span class="dv">2</span> <span class="op">*</span> np.eye(<span class="dv">2</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Starting values</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial state vector</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>s0 <span class="op">=</span> np.array([[<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="op">-</span><span class="fl">1.0</span>]]).T  <span class="co"># column vector</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial noise covariance</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>Sigma0 <span class="op">=</span> np.eye(<span class="dv">4</span>)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">100</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="manual-kalman-filter-would-need-numerical-improvements" class="level3">
+<h3 class="anchored" data-anchor-id="manual-kalman-filter-would-need-numerical-improvements">Manual Kalman filter, would need numerical improvements</h3>
+<div id="d3430f01-390a-4be4-912a-f22a3689a212" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> s0</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Sigma <span class="op">=</span> Sigma0</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>kf_mean <span class="op">=</span> np.zeros((s.shape[<span class="dv">0</span>], n))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>kf_Sigma <span class="op">=</span> np.zeros((Sigma.shape[<span class="dv">0</span>], Sigma.shape[<span class="dv">1</span>], n))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">100</span>):</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    R_t <span class="op">=</span> G <span class="op">@</span> Sigma <span class="op">@</span> G.T <span class="op">+</span> Omega_eta</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    S <span class="op">=</span> F <span class="op">@</span> R_t <span class="op">@</span> F.T <span class="op">+</span> Omega_epsilon</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span> linalg.lstsq(S.T, (R_t <span class="op">@</span> F.T).T)[<span class="dv">0</span>].T</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># K = (R_t @ F.T) @ np.linalg.pinv(S)</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    s_t <span class="op">=</span> G <span class="op">@</span> s</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> s_t <span class="op">+</span> K <span class="op">@</span> (Y[:, t, np.newaxis] <span class="op">-</span> F <span class="op">@</span> s_t)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    Sigma <span class="op">=</span> R_t<span class="op">-</span> K <span class="op">@</span> S <span class="op">@</span> K.T</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    kf_mean[:, t] <span class="op">=</span> s.flatten()</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    kf_Sigma[:, :, t] <span class="op">=</span> Sigma</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.DataFrame(kf_mean.T, columns<span class="op">=</span>[<span class="st">'x1'</span>, <span class="st">'x2'</span>, <span class="st">'dx1/dt'</span>, <span class="st">'dx2/dt'</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           x1         x2    dx1/dt    dx2/dt
+0   -0.281083  -0.235580  0.962081 -1.013491
+1    0.100219  -0.200777  1.122475 -0.936892
+2    0.228852  -0.735516  1.141854 -1.458522
+3    0.379437  -0.749947  1.202244 -1.240481
+4    0.587982  -0.449752  1.367730 -0.445575
+..        ...        ...       ...       ...
+95  11.935788  14.163066  0.888412  1.743867
+96  12.036713  14.317419  0.900481  1.723859
+97  12.261151  14.588231  1.034703  1.822161
+98  12.322096  14.765653  0.992230  1.817373
+99  12.501377  14.992161  1.072189  1.862088
+
+[100 rows x 4 columns]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/tmp/ipykernel_786442/1222645060.py:8: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
+To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
+  K = linalg.lstsq(S.T, (R_t @ F.T).T)[0].T</code></pre>
+</div>
+</div>
+</section>
+<section id="kalman-filter-using-statsmodels" class="level3">
+<h3 class="anchored" data-anchor-id="kalman-filter-using-statsmodels">Kalman filter using statsmodels</h3>
+<div id="7b20f8b4-8678-43ab-ac5b-ac194f16d151" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Now instantiate a statespace model with the data</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (data should be shaped nobs x n_variables))</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>kf <span class="op">=</span> sm.tsa.statespace.MLEModel(pd.DataFrame(Y.T), k_states<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>kf._state_names <span class="op">=</span> [<span class="st">'x1'</span>, <span class="st">'x2'</span>, <span class="st">'dx1/dt'</span>, <span class="st">'dx2/dt'</span>]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>kf[<span class="st">'design'</span>] <span class="op">=</span> F</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>kf[<span class="st">'obs_cov'</span>] <span class="op">=</span> Omega_epsilon</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>kf[<span class="st">'transition'</span>] <span class="op">=</span> G</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>kf[<span class="st">'selection'</span>] <span class="op">=</span> np.eye(<span class="dv">4</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>kf[<span class="st">'state_cov'</span>] <span class="op">=</span> Omega_eta</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Unfortunate difference in timing convetions</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># https://www.statsmodels.org/stable/statespace.html#models-and-estimation</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>kf.initialize_known(G <span class="op">@</span> s0[:, <span class="dv">0</span>], G <span class="op">@</span> Sigma0 <span class="op">@</span> G.T <span class="op">+</span> Omega_eta)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co"># To performan Kalman filtering and smoothing, use:</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> kf.smooth([])</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Display filtered</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(res.states.filtered)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           x1         x2    dx1/dt    dx2/dt
+0   -0.281083  -0.235580  0.962081 -1.013491
+1    0.100219  -0.200777  1.122475 -0.936892
+2    0.228852  -0.735516  1.141854 -1.458522
+3    0.379437  -0.749947  1.202244 -1.240481
+4    0.587982  -0.449752  1.367730 -0.445575
+..        ...        ...       ...       ...
+95  11.935788  14.163066  0.888412  1.743867
+96  12.036713  14.317419  0.900481  1.723859
+97  12.261151  14.588231  1.034703  1.822161
+98  12.322096  14.765653  0.992230  1.817373
+99  12.501377  14.992161  1.072189  1.862088
+
+[100 rows x 4 columns]</code></pre>
+</div>
+</div>
+</section>
+<section id="manual-verification-of-first-step-using-pymc" class="level3">
+<h3 class="anchored" data-anchor-id="manual-verification-of-first-step-using-pymc">Manual verification of first step using pymc</h3>
+<div id="6a28f5c804c0f416" class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model_multi:  <span class="co"># model specifications in PyMC are wrapped in a with-statement</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    ss <span class="op">=</span> pm.MvNormal(<span class="st">"ss"</span>, mu<span class="op">=</span>G<span class="op">@</span>s0[:, <span class="dv">0</span>], cov<span class="op">=</span>G<span class="op">@</span>Sigma0<span class="op">@</span>G.T <span class="op">+</span> Omega_eta, transform<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Define likelihood</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    likelihood <span class="op">=</span> pm.MvNormal(<span class="st">"y"</span>, mu<span class="op">=</span>F <span class="op">@</span> ss, cov<span class="op">=</span>Omega_epsilon, observed<span class="op">=</span>Y[:, [<span class="dv">0</span>]].T)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Inference!</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># draw 3000 posterior samples using NUTS sampling</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    idata <span class="op">=</span> pm.sample(draws<span class="op">=</span><span class="dv">3000</span>, chains<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># find MAP</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    res_MAP <span class="op">=</span> pm.find_MAP(maxeval<span class="op">=</span><span class="dv">50000</span>, return_raw<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.DataFrame(np.array([res_MAP[<span class="dv">0</span>][<span class="st">'ss'</span>]]), columns<span class="op">=</span>[<span class="st">'x1'</span>, <span class="st">'x2'</span>, <span class="st">'dx1/dt'</span>, <span class="st">'dx2/dt'</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [ss]
+Sampling 4 chains for 1_000 tune and 3_000 draw iterations (4_000 + 12_000 draws total) took 6 seconds.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"7ac65e1d94724c82b8bb02d8b8b6ae19","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"42ebbd5584784a3481b6a3b1df400fa3","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         x1       x2    dx1/dt    dx2/dt
+0 -0.281083 -0.23558  0.962081 -1.013491</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
