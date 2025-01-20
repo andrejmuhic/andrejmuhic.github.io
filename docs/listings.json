@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/19_01_2025_most_independent_columns/most_independent_columns.html",
       "/posts/17_06_2024_what_is_dropout_doing/attention_dropout.html",
       "/posts/05_06_2024_kalman_filter/kalman_filter.html",
       "/posts/03_06-2024_strict_named_dimensions_typed_checking/named_typed_checking.html",
